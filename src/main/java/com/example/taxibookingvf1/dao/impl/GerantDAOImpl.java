@@ -20,7 +20,7 @@ public class GerantDAOImpl implements GerantDAO{
 	@Override
 	public Gerant authentifier(String login, String motdepasse) throws SQLException {
 		String query="select * from gerant WHERE UPPER(login)=UPPER('"+login+"') and motPasse='"+motdepasse+"' LIMIT 1";
-		con=Factory.dbConnect();
+		con =Factory.getInstance().getConnection();
 		Statement stmt =con.createStatement();
 		rs= stmt.executeQuery(query);
 		if(rs.next()) {

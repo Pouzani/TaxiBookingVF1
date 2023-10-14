@@ -34,7 +34,7 @@ public class ReservationDAOImpl implements ReservationDAO{
 	public Boolean add(Reservation reservation) throws SQLException {
 		Boolean isAdded=false;
 		String query = "INSERT INTO reservation (taxi_id, client_id, date_reservation, heureDebut_reservation,minDebut_reservation,heureFin_reservation,minFin_reservation, isValidate) VALUES (?,?,?,?,?,?,?,2)";
-		con =Factory.dbConnect();
+		con =Factory.getInstance().getConnection();
         ps = con.prepareStatement(query);
         ps.setLong(1,reservation.getTaxi().getTexi_ID());
         ps.setLong(2, reservation.getClient().getClient_id());
@@ -45,14 +45,13 @@ public class ReservationDAOImpl implements ReservationDAO{
         ps.setInt(7, reservation.getMinFin_reservation());
         if(ps.executeUpdate()>0) {
         	isAdded=true;}
-        con.close();
         return isAdded;
 	}
 
 	@Override
 	public Boolean update(Reservation reservation) throws SQLException {
 		String query = "UPDATE reservation SET taxi_id=?, client_id=?, date_reservation=?, heureDebut_reservation=?,minDebut_reservation=?,heureFin_reservation=?,minFin_reservation=?, isValidate=? WHERE res_id=?";
-		con =Factory.dbConnect();
+		con =Factory.getInstance().getConnection();
         ps = con.prepareStatement(query);
         ps.setLong(1,reservation.getTaxi().getTexi_ID());
         ps.setLong(2, reservation.getClient().getClient_id());
@@ -63,17 +62,15 @@ public class ReservationDAOImpl implements ReservationDAO{
         ps.setInt(7, reservation.getMinFin_reservation());
         ps.setBoolean(8, false);
         ps.setLong(9,reservation.getRes_id());
-        con.close();
         return  ps.executeUpdate()>0;
 	}
 
 	@Override
 	public Boolean deleteByID(Long res_id) throws SQLException {
 		String query = "DELETE FROM reservation WHERE res_id=?";
-		con =Factory.dbConnect();
+		con =Factory.getInstance().getConnection();
         ps = con.prepareStatement(query);
         ps.setLong(1,res_id);
-        con.close();
         return  ps.executeUpdate()>0;
 	}
 
@@ -81,7 +78,7 @@ public class ReservationDAOImpl implements ReservationDAO{
 	public Reservation getOneById(Long res_id) throws SQLException {
 		Reservation reservation = new Reservation();
 		String query="SELECT * FROM reservation WHERE res_id=?";
-		con=Factory.dbConnect();
+		con =Factory.getInstance().getConnection();
 		ps=con.prepareStatement(query);
 		ps.setLong(1, res_id);
 		rs=ps.executeQuery();
@@ -95,7 +92,6 @@ public class ReservationDAOImpl implements ReservationDAO{
 			reservation.setMinFin_reservation(rs.getInt("minFin_reservation"));
 			reservation.setIsValidate(rs.getInt("isValidate"));
 		}
-		con.close();
 		return reservation;
 		
 	}
@@ -104,7 +100,7 @@ public class ReservationDAOImpl implements ReservationDAO{
 	public Set<Reservation> getAll() throws SQLException {
 		Set<Reservation> reservations = new HashSet<>();
 		String query="SELECT * FROM reservation";
-		con=Factory.dbConnect();
+		con =Factory.getInstance().getConnection();
 		ps=con.prepareStatement(query);
 		rs=ps.executeQuery();
 		while(rs.next()) {
@@ -120,7 +116,6 @@ public class ReservationDAOImpl implements ReservationDAO{
 			reservation.setIsValidate(rs.getInt("isValidate"));
 			reservations.add(reservation);
 		}
-		con.close();
 		return reservations;
 	}
 
@@ -128,13 +123,12 @@ public class ReservationDAOImpl implements ReservationDAO{
 	public Boolean setValidationReservation(Long idReservation, int decision) throws SQLException {
 		Boolean isValidate=false;
 		String query = "UPDATE reservation SET isValidate=? WHERE res_id=?";
-		con =Factory.dbConnect();
+		con =Factory.getInstance().getConnection();
         ps = con.prepareStatement(query);
         ps.setLong(1,decision);
         ps.setLong(2,idReservation);
         if(ps.executeUpdate()>0) {
         	isValidate=true;}
-        con.close();
         return isValidate;
 	}
 
@@ -143,14 +137,13 @@ public class ReservationDAOImpl implements ReservationDAO{
 		
 		int count= 0;
 		String query="SELECT count(*) FROM reservation WHERE isValidate=? LIMIT 1";
-		con=Factory.dbConnect();
+		con =Factory.getInstance().getConnection();
 		ps=con.prepareStatement(query);
 		ps.setLong(1, validation);
 		rs=ps.executeQuery();
 		if(rs.next()) {
 			count=rs.getInt(1);
 		}
-		con.close();
 		return count;
 		
 	}
@@ -159,7 +152,7 @@ public class ReservationDAOImpl implements ReservationDAO{
 	public Set<Reservation> getAllByClient(Long idClient) throws SQLException {
 		Set<Reservation> reservations = new HashSet<>();
 		String query="SELECT * FROM reservation WHERE client_id=? ";
-		con=Factory.dbConnect();
+		con =Factory.getInstance().getConnection();
 		ps=con.prepareStatement(query);
 		ps.setLong(1, idClient);
 		rs=ps.executeQuery();
@@ -176,7 +169,6 @@ public class ReservationDAOImpl implements ReservationDAO{
 			reservation.setIsValidate(rs.getInt("isValidate"));
 			reservations.add(reservation);
 		}
-		con.close();
 		return reservations;
 	}
 
@@ -185,30 +177,28 @@ public class ReservationDAOImpl implements ReservationDAO{
 		
 		int count= 0;
 		String query="SELECT count(*) FROM reservation";
-		con=Factory.dbConnect();
+		con =Factory.getInstance().getConnection();
 		ps=con.prepareStatement(query);
 		rs=ps.executeQuery();
 		if(rs.next()) {
 			count=rs.getInt(1);
 		}
-		con.close();
 		return count;
 	}
 
-	@Override
-	public TreeMap<String, Integer> getStatistiqueReservation() throws SQLException {
-		TreeMap<String, Integer> statistique = new TreeMap<String, Integer>();
-		String query="select * from vue_statistique_reservation  WHERE numMoins <="+LocalDate.now().getMonthValue();
-		con=Factory.dbConnect();
-		Statement stmt =con.createStatement();
-		rs= stmt.executeQuery(query);
-		while(rs.next()) {
-			statistique.put(rs.getString("mois"),rs.getInt("nbreservation"));
-		}
-		con.close();
-		return statistique;
+		@Override
+		public TreeMap<String, Integer> getStatistiqueReservation() throws SQLException {
+			TreeMap<String, Integer> statistique = new TreeMap<String, Integer>();
+			String query="select * from vue_statistique_reservation  WHERE numMoins <="+LocalDate.now().getMonthValue();
+			con =Factory.getInstance().getConnection();
+			Statement stmt =con.createStatement();
+			rs= stmt.executeQuery(query);
+			while(rs.next()) {
+				statistique.put(rs.getString("mois"),rs.getInt("nbreservation"));
+			}
+			return statistique;
 
-	}
+		}
 		
 	
 
