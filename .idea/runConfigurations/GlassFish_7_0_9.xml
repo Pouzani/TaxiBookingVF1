@@ -5,6 +5,7 @@
       <artifact name="TaxiBookingVF1:war exploded">
         <settings />
       </artifact>
+<!--      ddfd-->
     </deployment>
     <server-settings>
       <option name="DOMAIN" value="domain1" />
