@@ -4,6 +4,7 @@ pipeline{
       maven'Maven'
     }
     stages {
+
       stage("build jar") {
         steps {
           script {
@@ -11,7 +12,7 @@ pipeline{
           }
         }
       }
-    stages {
+
           stage("build image") {
             steps {
               script {
