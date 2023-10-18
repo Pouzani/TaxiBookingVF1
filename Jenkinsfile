@@ -32,6 +32,13 @@ pipeline {
                     }
                 }
             }
+        stage("deploy image") {
+                    steps {
+                        script {
+                            gv.deployImage()
+                        }
+                    }
+                }
         }
     }
 }

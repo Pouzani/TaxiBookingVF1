@@ -3,4 +3,8 @@ def buildJar(){
     sh 'mvn package'
 }
 
+def deployImage(){
+    echo "deploy the image ..."
+}
+
 return this
